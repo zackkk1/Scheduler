@@ -11,7 +11,7 @@ class ContactInformation {
     string PhoneNumber;
     string Address;
     string City;
-    string State;  
+    string State;
     vector<TimeSegment> AvailableTime;
 };
 
