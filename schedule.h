@@ -14,10 +14,12 @@ enum class WorkScheduleError {
 
 class WorkSchedule {
   private:
+    std::vector<Person *> People;
     std::vector<Shift *> Shifts;
   public:
     WorkScheduleError AddShift(Shift *NewShift);
     WorkScheduleError RemoveShift(Shift *ShiftToRemove);
+    std::vector<Person *> GetPeople();
     void WriteToFile(std::string Filename);
     void ReadFromFile(std::string Filename);
     Shift *GetCurrentShift();

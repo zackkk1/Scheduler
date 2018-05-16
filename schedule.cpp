@@ -3,6 +3,10 @@
 
 #include "schedule.h"
 
+std::vector<Person *> WorkSchedule::GetPeople() {
+    return this->People;
+}
+
 WorkScheduleError WorkSchedule::RemoveShift(Shift *ShiftToRemove) {
     for(std::vector<Shift *>::iterator it = this->Shifts.begin();
         it != this->Shifts.end(); ++it) {
@@ -26,7 +30,7 @@ WorkScheduleError WorkSchedule::AddShift(Shift *NewShift) {
         }
     }
 
-    this->Shifts.insert(this->Shifts.begin(), NewShift);
+    this->Shifts.push_back(NewShift);
     return WorkScheduleError::ErrorOk;
 }
 
@@ -52,11 +56,18 @@ Shift *WorkSchedule::GetCurrentShift() {
 void WorkSchedule::WriteToFile(std::string Filename) {
     std::ofstream Out(Filename, std::ofstream::binary);
     if(Out.is_open()) {
+        size_t PeopleLength = this->People.size();
+        Out.write((const char *)&PeopleLength, sizeof(size_t));
+        for(std::vector<Person *>::iterator it = this->People.begin();
+            it != this->People.end(); ++it) {
+            (*it)->Write(&Out);
+        }
+
         size_t ShiftLength = this->Shifts.size();
         Out.write((const char *)&ShiftLength, sizeof(size_t));
         for(std::vector<Shift *>::iterator it = this->Shifts.begin();
         it != this->Shifts.end(); ++it) {
-            (*it)->WriteShift(&Out);
+            (*it)->Write(&Out);
         }
 
         Out.close();
@@ -66,34 +77,25 @@ void WorkSchedule::WriteToFile(std::string Filename) {
 void WorkSchedule::ReadFromFile(std::string Filename) {
     std::ifstream In(Filename, std::ofstream::binary);
     if(In.is_open()) {
-        size_t ShiftLength;
-        In.read((char *)&ShiftLength, sizeof(size_t));
-        for(size_t i = 0; i < ShiftLength; i++) {
-            Shift NewShift;
-            unsigned long long Time;
-            unsigned int Duration;
+        size_t PeopleLength;
+        In.read((char *)&PeopleLength, sizeof(size_t));
+        for(size_t i = 0; i < PeopleLength; i++) {
+            Person *NewPerson = new Person;
 
-            In.read((char *)&Time, sizeof(Time));
-            In.read((char *)&Duration, sizeof(Duration));
-
-            Person *Assigned = new Person; 
             size_t PersonLength;
             In.read((char *)&PersonLength, sizeof(PersonLength));
             char *PersonData = new char[PersonLength];
             In.read(PersonData, sizeof(char) * PersonLength);
 
-            //std::string copies byte data from PersonData, so we must call delete after.
-            Assigned->SetName(std::string(PersonData, PersonLength));
+            NewPerson->SetName(std::string(PersonData, PersonLength));
             delete PersonData;
-
-            NewShift.SetAssigned(Assigned);
 
             size_t PhoneNumberLength;
             In.read((char *)&PhoneNumberLength, sizeof(size_t));
             char *PhoneNumberData = new char[PhoneNumberLength];
             In.read(PhoneNumberData, sizeof(char) * PhoneNumberLength);
 
-            Assigned->Information.PhoneNumber = std::string(PhoneNumberData, PhoneNumberLength);
+            NewPerson->Information.PhoneNumber = std::string(PhoneNumberData, PhoneNumberLength);
             delete PhoneNumberData;
 
             size_t AddressLength;
@@ -101,7 +103,7 @@ void WorkSchedule::ReadFromFile(std::string Filename) {
             char *AddressData = new char[AddressLength];
             In.read(AddressData, sizeof(char) * AddressLength);
 
-            Assigned->Information.Address = std::string(AddressData, AddressLength);
+            NewPerson->Information.Address = std::string(AddressData, AddressLength);
             delete AddressData;
 
             size_t CityLength;
@@ -109,7 +111,7 @@ void WorkSchedule::ReadFromFile(std::string Filename) {
             char *CityData = new char[CityLength];
             In.read(CityData, sizeof(char) * CityLength);
 
-            Assigned->Information.City = std::string(CityData, CityLength);
+            NewPerson->Information.City = std::string(CityData, CityLength);
             delete CityData;
 
             size_t StateLength;
@@ -117,7 +119,7 @@ void WorkSchedule::ReadFromFile(std::string Filename) {
             char *StateData = new char[StateLength];
             In.read(StateData, sizeof(char) * StateLength);
 
-            Assigned->Information.State = std::string(StateData, StateLength);
+            NewPerson->Information.State = std::string(StateData, StateLength);
             delete StateData;
 
             size_t AvailableTimeLength;
@@ -127,11 +129,26 @@ void WorkSchedule::ReadFromFile(std::string Filename) {
                 In.read((char *)StartTime, sizeof(unsigned int));
                 In.read((char *)EndTime, sizeof(unsigned int));
                 TimeSegment NewSegment(StartTime, EndTime);
-                Assigned->Information.AvailableTime.insert(
-                    Assigned->Information.AvailableTime.begin(), NewSegment);
+                NewPerson->Information.AvailableTime.push_back(NewSegment);
             }
 
-            this->Shifts.insert(this->Shifts.begin(), &NewShift);
+            this->People.push_back(NewPerson);
+        }
+
+        size_t ShiftLength;
+        In.read((char *)&ShiftLength, sizeof(size_t));
+        for(size_t i = 0; i < ShiftLength; i++) {
+            Shift *NewShift = new Shift;
+            unsigned long long Time;
+            unsigned int Duration;
+            int PersonIndex;
+
+            In.read((char *)&Time, sizeof(Time));
+            In.read((char *)&Duration, sizeof(Duration));
+            In.read((char *)&PersonIndex, sizeof(PersonIndex));
+
+            NewShift->SetAssignedIndex(PersonIndex);
+            this->Shifts.push_back(NewShift);
         }
     }
 }

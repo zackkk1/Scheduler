@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <fstream>
 
 class TimeSegment {
   public:
@@ -27,6 +28,7 @@ class Person {
     ContactInformation Information;
     std::string GetName(void);
     void SetName(std::string Name);
+    void Write(std::ofstream *Stream);
     ContactInformation GetInformation(void);
 };
 

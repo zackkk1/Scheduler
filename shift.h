@@ -8,15 +8,15 @@ class Shift {
   private:
     unsigned long long Time;
     unsigned int Duration;
-    Person *Assigned;
+    int AssignedIndex;
   public:
     unsigned long long GetTime(void);
     void SetTime(unsigned long long Time);
     unsigned int GetDuration(void);
-    Person *GetAssigned(void);
+    int GetAssignedIndex(void);
     void SetDuration(unsigned long long Duration);
-    void SetAssigned(Person *Assigne);
-    void WriteShift(std::ofstream *Stream);
+    void SetAssignedIndex(int AssignedIndex);
+    void Write(std::ofstream *Stream);
 };
 
 #endif
