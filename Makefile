@@ -1,21 +1,21 @@
 all: main.exe
 
 main.exe: schedule.o main.o shift.o person.o
-	g++ $^ -o main.exe
+	g++ -g $^ -o main.exe
 
 main.o: main.cpp
-	g++ -c main.cpp
+	g++ -g -c main.cpp
 
 schedule.o: schedule.cpp schedule.h
-	g++ -c schedule.cpp
+	g++ -g -c schedule.cpp
 
 shift.o: shift.cpp shift.h
-	g++ -c shift.cpp
+	g++ -g -c shift.cpp
 
 person.o: person.cpp person.h
-	g++ -c person.cpp
+	g++ -g -c person.cpp
 
 clean:
-	del main.exe schedule.o main.o
+	rm -f main.exe schedule.o main.o shift.o person.o
 
 .PHONY: clean all
