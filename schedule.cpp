@@ -3,14 +3,6 @@
 
 #include "schedule.h"
 
-unsigned long long Shift::GetTime() {
-    return this->Time;
-}
-
-unsigned int Shift::GetDuration() {
-    return this->Duration;
-}
-
 WorkScheduleError WorkSchedule::RemoveShift(Shift *ShiftToRemove) {
     for(std::vector<Shift *>::iterator it = this->Shifts.begin();
         it != this->Shifts.end(); ++it) {
@@ -60,26 +52,43 @@ Shift *WorkSchedule::GetCurrentShift() {
 void WorkSchedule::WriteToFile(std::string Filename) {
     std::ofstream Out(Filename, std::ofstream::binary);
     if(Out.is_open()) {
+        size_t ShiftLength = this->Shifts.size();
+        Out.write((const char *)&ShiftLength, sizeof(size_t));
         for(std::vector<Shift *>::iterator it = this->Shifts.begin();
         it != this->Shifts.end(); ++it) {
-            (*it)->WriteShift(Out);
+            (*it)->WriteShift(&Out);
         }
 
         Out.close();
     }
 }
 
-void Shift::WriteShift(std::ofstream Stream) {
-    //Write Time and Duration
-    Stream.write((const char *)&this->Time, sizeof(this->Time));
-    Stream.write((const char *)&this->Duration, sizeof(this->Duration));
+void WorkSchedule::ReadFromFile(std::string Filename) {
+    std::ifstream In(Filename, std::ofstream::binary);
+    if(In.is_open()) {
+        size_t ShiftLength;
+        In.read((char *)&ShiftLength, sizeof(size_t));
+        for(size_t i = 0; i < ShiftLength; i++) {
+            Shift NewShift;
+            unsigned long long Time;
+            unsigned int Duration;
 
-    //Write Person's name to file, need to prefix with the length first so we can read
-    //that many bytes.
-    int NameLength = this->Assigned->GetName().length;
-    Stream.write((const char *)&NameLength, sizeof(NameLength));
-    Stream.write((const char *)this->Assigned->GetName().c_str(), sizeof(const char *) * NameLength);
+            In.read((char *)&Time, sizeof(Time));
+            In.read((char *)&Duration, sizeof(Duration));
 
-    //Write Contact Information
-    
+            Person *Assigned = new Person; 
+            size_t PersonLength;
+            In.read((char *)&PersonLength, sizeof(PersonLength));
+            char *PersonData = new char[PersonLength];
+            In.read(PersonData, sizeof(char) * PersonLength);
+
+            //std::string copies byte data from PersonData, so we must call delete after.
+            Assigned->SetName(std::string(PersonData, PersonLength));
+            delete PersonData;
+
+            NewShift.SetAssigned(Assigned);
+
+            this->Shifts.insert(this->Shifts.begin(), &NewShift);
+        }
+    }
 }
