@@ -1,5 +1,6 @@
 #include <iostream>
 #include "schedule.h"
+#include <ctime>
 
 const char *WelcomeMessage = "Welcome to Schedule Builder, this program is here to help you manager" \
 " and build schedules. \nTo load an existing schedule pass the schedule as the first argument to this executable.\n" \
@@ -35,16 +36,41 @@ Shift *NewShiftFromUser(WorkSchedule *const Schedule) {
 
     NewShift->SetAssignedIndex(Index);
 
-    unsigned long long Time;
-    unsigned int Duration;
-    std::cout << "What time do they start? ";
-    std::cin >> Time;
+    std::time_t CurrentTimeT = time(nullptr);
+    struct tm *CurrentTime = localtime(&CurrentTimeT);
 
-    std::cout << "What is their duration? ";
-    std::cin >> Duration;
+    unsigned int Day;
+    unsigned int Month;
+    float Hour;
+    float DurationInHours;
+    std::cout << "What month they start (1-12)? ";
+    std::cin >> Month;
 
-    NewShift->SetTime(Time);
-    NewShift->SetDuration(Duration);
+    std::cout << "What day they start (integral)? ";
+    std::cin >> Day;
+
+    std::cout << "On what hour do they start (1-24hr)? ";
+    std::cin >> Hour;
+
+    std::cout << "How long do they work for (in hours)? ";
+    std::cin >> DurationInHours;
+    unsigned int Duration = DurationInHours * 60 * 60;
+
+    struct tm WorkTime = {0};
+    WorkTime.tm_year = CurrentTime->tm_year;
+    WorkTime.tm_mday = Day;
+    WorkTime.tm_mon = Month - 1;
+    WorkTime.tm_hour = (int)Hour - 1;
+    WorkTime.tm_min = (int)(Hour * 60) % 60;
+
+    std::time_t WorkTimeT = mktime(&WorkTime);
+
+    char buffer[32];
+    std::strftime(buffer, 32, "%a, %m/%d/%Y %H:%M:%S", &WorkTime);  
+
+    std::cout << buffer;
+    NewShift->SetTime(WorkTimeT);
+    NewShift->SetDuration(DurationInHours * 60 * 60);
     return NewShift;
 }
 
