@@ -10,6 +10,7 @@ enum CommandCode {
     Help,
     NewShift,
     NewPerson,
+    Save,
     Unknown
 };
 
@@ -18,17 +19,45 @@ CommandCode GetCommandCode(std::string const& InString) {
     if(InString == "help") return Help;
     if(InString == "nshift") return NewShift;
     if(InString == "nperson") return NewPerson;
+    if(InString == "save") return Save;
     return Unknown;
 }
 
-Shift *NewShiftFromUser(void) {
-    return nullptr;
+Shift *NewShiftFromUser(WorkSchedule *const Schedule) {
+    Shift *NewShift = new Shift;
+    std::cout << "First you need to select the person's index, I will list them for you." << std::endl;
+    Schedule->PrintPeople();
+    std::cout << std::endl;
+
+    int Index;
+    std::cout << "What is the desired person's index? ";
+    std::cin >> Index;
+
+    NewShift->SetAssignedIndex(Index);
+
+    unsigned long long Time;
+    unsigned int Duration;
+    std::cout << "What time do they start? ";
+    std::cin >> Time;
+
+    std::cout << "What is their duration? ";
+    std::cin >> Duration;
+
+    NewShift->SetTime(Time);
+    NewShift->SetDuration(Duration);
+    return NewShift;
 }
 
 Person *NewPersonFromUser(void) {
+    Person *NewPerson = new Person;
+    std::string FirstName, LastName;
     std::cout << "What is this person's first name? ";
-    
-    return nullptr;
+    std::cin >>FirstName;
+    std::cout << "What is this person's last name? ";
+    std::cin >>LastName;
+
+    NewPerson->SetName(FirstName + " " + LastName);
+    return NewPerson;
 }
 
 void PrintHelp(void) {
@@ -43,7 +72,7 @@ int main(int argc, char **argv) {
     bool Running = true;
     WorkSchedule Scheudle;
     if(argc > 1) {
-        //Load file here.
+        Scheudle.ReadFromFile(argv[1]);
     }
 
     std::cout << WelcomeMessage << std::endl;
@@ -66,7 +95,7 @@ int main(int argc, char **argv) {
                     break;
                 }
 
-                Shift *NewShift = NewShiftFromUser();
+                Shift *NewShift = NewShiftFromUser(&Scheudle);
                 if(NewShift != nullptr) {
                     Scheudle.AddShift(NewShift);
                 } else {
@@ -74,7 +103,16 @@ int main(int argc, char **argv) {
                 }
             } break;
             case NewPerson: {
-
+                Person *NewPerson = NewPersonFromUser();
+                if(NewPerson != nullptr) {
+                    Scheudle.AddPerson(NewPerson);
+                } else {
+                    std::cout << "Aborting creation of new person." << std::endl;
+                }
+            } break;
+            case Save: {
+                Scheudle.WriteToFile("schedule.sch");
+                std::cout << "Wrote to file \"schedule.sch\"" << std::endl;
             } break;
             default:
                 std::cout << "Error command \"" << Command << "\" not found." << std::endl;

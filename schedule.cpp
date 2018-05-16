@@ -1,5 +1,6 @@
 #include <ctime>
 #include <fstream>
+#include <iostream>
 
 #include "schedule.h"
 
@@ -66,7 +67,7 @@ void WorkSchedule::WriteToFile(std::string Filename) {
         size_t ShiftLength = this->Shifts.size();
         Out.write((const char *)&ShiftLength, sizeof(size_t));
         for(std::vector<Shift *>::iterator it = this->Shifts.begin();
-        it != this->Shifts.end(); ++it) {
+            it != this->Shifts.end(); ++it) {
             (*it)->Write(&Out);
         }
 
@@ -150,5 +151,17 @@ void WorkSchedule::ReadFromFile(std::string Filename) {
             NewShift->SetAssignedIndex(PersonIndex);
             this->Shifts.push_back(NewShift);
         }
+    }
+}
+
+void WorkSchedule::AddPerson(Person *NewPerson) {
+    this->People.push_back(NewPerson);
+}
+
+void WorkSchedule::PrintPeople() {
+    unsigned int i = 0;
+    for(std::vector<Person *>::iterator it = this->People.begin();
+        it != this->People.end(); ++it, ++i) {
+        std::cout << "[" << i << "] " << (*it)->GetName() << std::endl;
     }
 }

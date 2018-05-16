@@ -14,7 +14,7 @@ class Shift {
     void SetTime(unsigned long long Time);
     unsigned int GetDuration(void);
     int GetAssignedIndex(void);
-    void SetDuration(unsigned long long Duration);
+    void SetDuration(unsigned int Duration);
     void SetAssignedIndex(int AssignedIndex);
     void Write(std::ofstream *Stream);
 };

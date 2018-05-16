@@ -18,10 +18,12 @@ class WorkSchedule {
     std::vector<Shift *> Shifts;
   public:
     WorkScheduleError AddShift(Shift *NewShift);
+    void AddPerson(Person *NewPerson);
     WorkScheduleError RemoveShift(Shift *ShiftToRemove);
     std::vector<Person *> GetPeople();
     void WriteToFile(std::string Filename);
     void ReadFromFile(std::string Filename);
+    void PrintPeople(void);
     Shift *GetCurrentShift();
 };
 

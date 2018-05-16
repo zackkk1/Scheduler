@@ -9,6 +9,14 @@ unsigned int Shift::GetDuration() {
     return this->Duration;
 }
 
+void Shift::SetTime(unsigned long long Time) {
+    this->Time = Time;
+}
+
+void Shift::SetDuration(unsigned int Duration) {
+    this->Duration = Duration;
+}
+
 int Shift::GetAssignedIndex() {
     return this->AssignedIndex;
 }
