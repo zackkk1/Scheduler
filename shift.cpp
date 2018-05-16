@@ -9,6 +9,10 @@ unsigned int Shift::GetDuration() {
     return this->Duration;
 }
 
+Person *Shift::GetAssigned() {
+    return this->Assigned;
+}
+
 void Shift::WriteShift(std::ofstream *Stream) {
     size_t NameLength, PhoneNumberLength, AddressLength, CityLength, StateLength, AvailableTimeLength;
     //Write Time and Duration

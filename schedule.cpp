@@ -88,6 +88,48 @@ void WorkSchedule::ReadFromFile(std::string Filename) {
 
             NewShift.SetAssigned(Assigned);
 
+            size_t PhoneNumberLength;
+            In.read((char *)&PhoneNumberLength, sizeof(size_t));
+            char *PhoneNumberData = new char[PhoneNumberLength];
+            In.read(PhoneNumberData, sizeof(char) * PhoneNumberLength);
+
+            Assigned->Information.PhoneNumber = std::string(PhoneNumberData, PhoneNumberLength);
+            delete PhoneNumberData;
+
+            size_t AddressLength;
+            In.read((char *)&AddressLength, sizeof(size_t));
+            char *AddressData = new char[AddressLength];
+            In.read(AddressData, sizeof(char) * AddressLength);
+
+            Assigned->Information.Address = std::string(AddressData, AddressLength);
+            delete AddressData;
+
+            size_t CityLength;
+            In.read((char *)&CityLength, sizeof(size_t));
+            char *CityData = new char[CityLength];
+            In.read(CityData, sizeof(char) * CityLength);
+
+            Assigned->Information.City = std::string(CityData, CityLength);
+            delete CityData;
+
+            size_t StateLength;
+            In.read((char *)&StateLength, sizeof(size_t));
+            char *StateData = new char[StateLength];
+            In.read(StateData, sizeof(char) * StateLength);
+
+            Assigned->Information.State = std::string(StateData, StateLength);
+
+            size_t AvailableTimeLength;
+            In.read((char *)&AvailableTimeLength, sizeof(size_t));
+            for(size_t j = 0; j < AvailableTimeLength; j++) {
+                size_t StartTime, EndTime;
+                In.read((char *)StartTime, sizeof(unsigned int));
+                In.read((char *)EndTime, sizeof(unsigned int));
+                TimeSegment NewSegment(StartTime, EndTime);
+                Assigned->Information.AvailableTime.insert(
+                    Assigned->Information.AvailableTime.begin(), NewSegment);
+            }
+
             this->Shifts.insert(this->Shifts.begin(), &NewShift);
         }
     }

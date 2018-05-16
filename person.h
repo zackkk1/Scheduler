@@ -6,6 +6,7 @@
 
 class TimeSegment {
   public:
+    TimeSegment(unsigned int StartTime, unsigned int EndTime);
     unsigned int StartTime;
     unsigned int EndTime;
 };
@@ -22,8 +23,8 @@ class ContactInformation {
 class Person {
   private:
     std::string Name;
-    ContactInformation Information;
   public:
+    ContactInformation Information;
     std::string GetName(void);
     void SetName(std::string Name);
     ContactInformation GetInformation(void);

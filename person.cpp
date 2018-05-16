@@ -1,5 +1,10 @@
 #include "person.h"
 
+TimeSegment::TimeSegment(unsigned int StartTime, unsigned int EndTime) {
+    this->StartTime = StartTime;
+    this->EndTime = EndTime;
+}
+
 std::string Person::GetName() {
     return this->Name;
 }

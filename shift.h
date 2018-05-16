@@ -13,6 +13,7 @@ class Shift {
     unsigned long long GetTime(void);
     void SetTime(unsigned long long Time);
     unsigned int GetDuration(void);
+    Person *GetAssigned(void);
     void SetDuration(unsigned long long Duration);
     void SetAssigned(Person *Assigne);
     void WriteShift(std::ofstream *Stream);
