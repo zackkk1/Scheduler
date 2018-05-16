@@ -118,6 +118,7 @@ void WorkSchedule::ReadFromFile(std::string Filename) {
             In.read(StateData, sizeof(char) * StateLength);
 
             Assigned->Information.State = std::string(StateData, StateLength);
+            delete StateData;
 
             size_t AvailableTimeLength;
             In.read((char *)&AvailableTimeLength, sizeof(size_t));
