@@ -1,9 +1,12 @@
-all: Schedule
+all: main.exe
 
-Schedule: Schedule.cpp
-	g++ Schedule.cpp -o Schedule
+main.exe: schedule.o main.o
+	g++ schedule.o main.o -o main.exe
+
+schedule: schedule.cpp
+	g++ -c schedule.cpp
 
 clean:
-	del Schedule
+	del main.exe schedule.o main.o
 
 .PHONY: clean all
